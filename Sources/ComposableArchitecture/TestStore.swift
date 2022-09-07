@@ -269,23 +269,6 @@
       )
     }
 
-    #if swift(>=5.7)
-      /// Suspends until all in-flight effects have finished, or until it times out.
-      ///
-      /// Can be used to assert that all effects have finished.
-      ///
-      /// - Parameter duration: The amount of time to wait before asserting.
-      @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
-      @MainActor
-      public func finish(
-        timeout duration: Duration? = nil,
-        file: StaticString = #file,
-        line: UInt = #line
-      ) async {
-        await self.finish(timeout: duration?.nanoseconds, file: file, line: line)
-      }
-    #endif
-
     /// Suspends until all in-flight effects have finished, or until it times out.
     ///
     /// Can be used to assert that all effects have finished.
@@ -753,35 +736,6 @@
       }
     }
 
-    #if swift(>=5.7)
-      /// Asserts an action was received from an effect and asserts how the state changes.
-      ///
-      /// - Parameters:
-      ///   - expectedAction: An action expected from an effect.
-      ///   - duration: The amount of time to wait for the expected action.
-      ///   - updateExpectingResult: A closure that asserts state changed by sending the action to
-      ///     the store. The mutable state sent to this closure must be modified to match the state
-      ///     of the store after processing the given action. Do not provide a closure if no change
-      ///     is expected.
-      @MainActor
-      @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
-      public func receive(
-        _ expectedAction: Action,
-        timeout duration: Duration,
-        _ updateExpectingResult: ((inout ScopedState) throws -> Void)? = nil,
-        file: StaticString = #file,
-        line: UInt = #line
-      ) async {
-        await self.receive(
-          expectedAction,
-          timeout: duration.nanoseconds,
-          updateExpectingResult,
-          file: file,
-          line: line
-        )
-      }
-    #endif
-
     /// Asserts an action was received from an effect and asserts how the state changes.
     ///
     /// - Parameters:
@@ -940,20 +894,6 @@
       await self.rawValue?.cancellableValue
     }
 
-    #if swift(>=5.7)
-      /// Asserts the underlying task finished.
-      ///
-      /// - Parameter duration: The amount of time to wait before asserting.
-      @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
-      public func finish(
-        timeout duration: Duration? = nil,
-        file: StaticString = #file,
-        line: UInt = #line
-      ) async {
-        await self.finish(timeout: duration?.nanoseconds, file: file, line: line)
-      }
-    #endif
-
     /// Asserts the underlying task finished.
     ///
     /// - Parameter nanoseconds: The amount of time to wait before asserting.
@@ -1019,14 +959,4 @@
       }
     }
   }
-
-  #if swift(>=5.7)
-    @available(iOS 16, macOS 13, tvOS 16, watchOS 9, *)
-    extension Duration {
-      fileprivate var nanoseconds: UInt64 {
-        UInt64(self.components.seconds) * NSEC_PER_SEC
-          + UInt64(self.components.attoseconds) / 1_000_000_000
-      }
-    }
-  #endif
 #endif
